@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>SolarIA</title>
+  <style>
+    body {
+      font-family: Cambria, sans-serif;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      background-color: #f8f9fa;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    #chat {
+      background-color: #fff;
+      padding: 15px;
+      border-radius: 5px;
+      height: 400px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      margin-bottom: 10px;
+    }
+
+    .mensagem {
+      margin-bottom: 10px;
+    }
+
+    .usuario {
+      font-weight: bold;
+      color: #007bff;
+    }
+
+    .bot {
+      font-weight: bold;
+      color:  #4f2ac9;
+    }
+
+    input, button {
+      padding: 10px;
+      width: calc(100% - 20px);
+      margin-top: 10px;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: #4f2ac9;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #113a94;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>SolarIA</h2>
+
+  <div id="chat"></div>
+
+  <input type="text" id="pergunta" placeholder="Digite sua pergunta">
+  <button onclick="enviarPergunta()">Enviar</button>
+
+  <script>
+    async function enviarPergunta() {
+      const inputEl = document.getElementById("pergunta");
+      const pergunta = inputEl.value.trim();
+      const chatEl = document.getElementById("chat");
+
+      if (!pergunta) {
+        return;
+      }
+
+      // Adiciona a pergunta do usuário ao chat
+      const msgUsuario = document.createElement("div");
+      msgUsuario.className = "mensagem usuario";
+      msgUsuario.innerText = "Você: " + pergunta;
+      chatEl.appendChild(msgUsuario);
+
+      // Rola para a última mensagem
+      chatEl.scrollTop = chatEl.scrollHeight;
+
+      // Limpa o campo de entrada
+      inputEl.value = "";
+
+      // Mostra mensagem de carregando
+      const msgBot = document.createElement("div");
+      msgBot.className = "mensagem bot";
+      msgBot.innerText = "Digitando...";
+      chatEl.appendChild(msgBot);
+      chatEl.scrollTop = chatEl.scrollHeight;
+
+      try {
+        const res = await fetch("http://127.0.0.1:5000/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ pergunta: pergunta })
+        });
+
+        const data = await res.json();
+        msgBot.innerText = "Chatbot: " + (data.resposta || data.erro || "Resposta inválida.");
+        chatEl.scrollTop = chatEl.scrollHeight;
+
+      } catch (err) {
+        msgBot.innerText = "Chatbot: Erro ao se comunicar com o servidor.";
+        console.error(err);
+        chatEl.scrollTop = chatEl.scrollHeight;
+      }
+    }
+  </script>
+
+</body>
+</html>
