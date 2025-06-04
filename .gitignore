@@ -1,0 +1,48 @@
+# Arquivos Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyd
+*.pyc
+*.pyo
+*.pyd
+
+# Configurações e chaves
+.env
+*.env
+
+# Logs
+*.log
+Logs.log
+
+# Pastas temporárias
+tmp/
+temp/
+*.tmp
+
+# Virtualenv
+venv/
+ENV/
+env/
+.venv/
+
+# Configurações IDE (VSCode, PyCharm)
+.vscode/
+.idea/
+
+# Arquivos do sistema operacional
+.DS_Store
+Thumbs.db
+
+# Deploy Azure
+.azure/
+
+
+# Arquivos do front (se incluir no mesmo repositório)
+build/
+dist/
+node_modules/
+
+# Configuração do OpenAI (apenas se for um arquivo separado)
+openai_key.txt

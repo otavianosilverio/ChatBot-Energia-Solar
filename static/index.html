@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SolarIA</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+   <h2><span class="solar">Solar</span><span class="ia">IA</span></h2>
+
+
+    <div id="chat" class="chat-box"></div>
+
+    <div class="input-area">
+      <input type="text" id="pergunta" placeholder="Digite sua pergunta..." />
+      <button id="botaoEnviar" onclick="enviarPergunta()">Enviar</button>
+    </div>
+  </div>
+
+  <script>
+    const inputEl = document.getElementById("pergunta");
+    const chatEl = document.getElementById("chat");
+    const botao = document.getElementById("botaoEnviar");
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.innerText = text;
+      return div.innerHTML;
+    }
+
+    async function enviarPergunta() {
+      const pergunta = inputEl.value.trim();
+      if (!pergunta) return;
+
+      const msgUsuario = document.createElement("div");
+      msgUsuario.className = "mensagem usuario";
+      msgUsuario.innerText = "Você: " + pergunta;
+      chatEl.appendChild(msgUsuario);
+      chatEl.scrollTop = chatEl.scrollHeight;
+
+      inputEl.value = "";
+      inputEl.disabled = true;
+      botao.disabled = true;
+      botao.innerText = "Enviando...";
+
+      const msgLoading = document.createElement("div");
+      msgLoading.className = "mensagem bot";
+      msgLoading.innerText = "Digitando...";
+      chatEl.appendChild(msgLoading);
+      chatEl.scrollTop = chatEl.scrollHeight;
+
+      try {
+        const res = await fetch("http://127.0.0.1:5000/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ pergunta: pergunta })
+        });
+
+        const data = await res.json();
+        chatEl.removeChild(msgLoading);
+
+        const msgResposta = document.createElement("div");
+        msgResposta.className = "mensagem bot";
+        msgResposta.innerText = "Chatbot: " + escapeHtml(data.resposta || data.erro || "Resposta inválida.");
+        chatEl.appendChild(msgResposta);
+        chatEl.scrollTop = chatEl.scrollHeight;
+
+      } catch (err) {
+        chatEl.removeChild(msgLoading);
+        const erroBot = document.createElement("div");
+        erroBot.className = "mensagem bot";
+        erroBot.innerText = "Chatbot: Erro ao se comunicar com o servidor.";
+        chatEl.appendChild(erroBot);
+        chatEl.scrollTop = chatEl.scrollHeight;
+        console.error(err);
+      } finally {
+        inputEl.disabled = false;
+        inputEl.focus();
+        botao.disabled = false;
+        botao.innerText = "Enviar";
+      }
+    }
+
+    inputEl.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") {
+        enviarPergunta();
+      }
+    });
+  </script>
+</body>
+</html>
